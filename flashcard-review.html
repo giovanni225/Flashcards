@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards - Review Incorrect Answers</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background-color: #1a1a2e;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      background: #0f3460;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    .flashcard-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+      perspective: 1000px;
+    }
+    .flashcard {
+      width: 280px;
+      height: 200px;
+      background: #1b1b2f;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.4s;
+    }
+    .flashcard div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+    }
+    .flashcard-front {
+      background: #1b1b2f;
+      color: #ffffff;
+    }
+    .flashcard-back {
+      background: #e94560;
+      color: white;
+      transform: rotateY(180deg);
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .btn {
+      padding: 14px;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      width: 60%;
+      outline: none;
+      font-size: 18px;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.1s;
+    }
+    .btn:hover {
+      opacity: 0.85;
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .btn-next {
+      background: #28a745;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Review Incorrect Answers</h2>
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard">
+        <div class="flashcard-front" id="questionText">Loading...</div>
+        <div class="flashcard-back" id="answerText">Answer</div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="btn btn-next" onclick="nextFlashcard()">Next</button>
+    </div>
+  </div>
+  
+  <script>
+    let notLearntQuestions = JSON.parse(localStorage.getItem("notLearntQuestions")) || [];
+    let currentReviewIndex = 0;
+    let flipped = false;
+
+    function updateFlashcard() {
+      if (currentReviewIndex >= notLearntQuestions.length) {
+        alert("End of review. Returning to results page.");
+        window.location.href = "flashcards-results.html";
+        return;
+      }
+      flipped = false;
+      document.getElementById("questionText").textContent = notLearntQuestions[currentReviewIndex].question;
+      document.getElementById("answerText").textContent = notLearntQuestions[currentReviewIndex].answer;
+      document.getElementById("flashcard").style.transform = "rotateY(0deg)";
+    }
+
+    function nextFlashcard() {
+      currentReviewIndex++;
+      updateFlashcard();
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.code === "Space" && !event.repeat) {
+        event.preventDefault();
+        flipped = !flipped;
+        document.getElementById("flashcard").style.transform = flipped ? "rotateY(180deg)" : "rotateY(0deg)";
+      }
+    });
+
+    window.onload = updateFlashcard;
+  </script>
+</body>
+</html>

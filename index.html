@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zn2it Klab QUIZES - Create Quiz</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background-color: #121212; 
+      color: #ffffff;
+      text-align: center;
+    }
+    .container { 
+      max-width: 600px; 
+      margin: auto; 
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    }
+    textarea { 
+      width: 100%; 
+      height: 150px; 
+      margin-bottom: 10px;
+      background: #2a2a2a;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .checkbox-group, .prompt-options { margin-bottom: 10px; }
+    .start-btn { 
+      display: block; 
+      margin-top: 20px; 
+      padding: 10px; 
+      background-color: #007BFF; 
+      color: white; 
+      border: none; 
+      cursor: pointer; 
+      text-align: center; 
+      border-radius: 5px;
+    }
+    .start-btn:hover { background-color: #0056b3; }
+    .preview-box { 
+      border: 1px solid #ccc; 
+      padding: 10px; 
+      margin-top: 10px; 
+      background-color: #1e1e1e; 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+      justify-content: center;
+    }
+    .preview-card { 
+      border: 1px solid #ddd; 
+      padding: 10px; 
+      background: #2a2a2a; 
+      width: 45%; 
+      border-radius: 10px;
+    }
+    .preview-card h4 { margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Create a Quiz</h1>
+    <label>Quiz Name:</label>
+    <input type="text" id="quizName" placeholder="Enter quiz name">
+    
+    <label>Input Prompt/Questions:</label>
+    <textarea id="questionsInput" placeholder="Enter questions, one per line" oninput="updatePreview()"></textarea>
+    
+    <label>Choose the Type of Prompt:</label>
+    <div class="prompt-options">
+      <input type="radio" name="term-separator" value="newline" checked onchange="updatePreview()"> 
+      <label>New Line</label>
+    </div>
+    
+    <label>Choose Quiz Type:</label>
+    <div class="checkbox-group">
+      <input type="checkbox" id="flashcard" value="flashcard" onchange="updatePreview()"> 
+      <label for="flashcard">Flashcard</label>
+    </div>
+    
+    <label>Preview:</label>
+    <div class="preview-box" id="previewContainer">
+      Your questions will appear here...
+    </div>
+    
+    <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+  </div>
+  
+  <script>
+    function updatePreview() {
+      let textarea = document.getElementById("questionsInput");
+      let previewContainer = document.getElementById("previewContainer");
+      let flashcardChecked = document.getElementById("flashcard").checked;
+      
+      previewContainer.innerHTML = "";
+      
+      if (!flashcardChecked) {
+        previewContainer.textContent = "Flashcards must be selected to preview.";
+        return;
+      }
+      
+      let lines = textarea.value.trim().split("\n");
+      
+      lines.forEach((line, index) => {
+        let parts = line.split(",");
+        let question = parts[0] || "(No question provided)";
+        let answer = parts[1] || "(No answer provided)";
+        
+        let card = document.createElement("div");
+        card.classList.add("preview-card");
+        card.innerHTML = `<h4>Q${index + 1}: ${question}</h4><p><strong>Answer:</strong> ${answer}</p>`;
+        
+        previewContainer.appendChild(card);
+      });
+    }
+    
+    function startQuiz() {
+      let questionsInput = document.getElementById("questionsInput").value.trim();
+      localStorage.setItem("quizQuestions", questionsInput);
+      // Redirect to the flashcards quiz page
+      window.location.href = "quiz-flashcards.html";
+    }
+  </script>
+</body>
+</html>

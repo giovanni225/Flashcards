@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Results</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background-color: #121212; 
+      color: #ffffff; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      height: 100vh; 
+      margin: 0;
+    }
+    .container { 
+      max-width: 600px; 
+      margin: auto; 
+      background: #1e1e1e; 
+      padding: 20px; 
+      border-radius: 10px; 
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    }
+    button { 
+      padding: 10px 20px; 
+      margin: 10px; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .review-btn { background-color: #007BFF; color: white; }
+    .new-quiz-btn { background-color: #28a745; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz Results</h1>
+    <p id="resultText"></p>
+    <button class="review-btn" onclick="goToReview()">Review Incorrect Answers</button>
+    <button class="new-quiz-btn" onclick="goToIndex()">Create New Quiz</button>
+  </div>
+  <script>
+    function goToReview() {
+      window.location.href = "flashcard-review.html";
+    }
+    function goToIndex() {
+      window.location.href = "index.html";
+    }
+    let learnt = JSON.parse(localStorage.getItem("learntQuestions")) || [];
+    let notLearnt = JSON.parse(localStorage.getItem("notLearntQuestions")) || [];
+    document.getElementById("resultText").textContent = `Learnt: ${learnt.length} | Not Learnt: ${notLearnt.length}`;
+  </script>
+</body>
+</html>

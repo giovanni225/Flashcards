@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zn2it Klab QUIZES - Flashcards</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      margin: 0; 
+      background-color: #121212; 
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      background: #1e1e2e;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #252540;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff6b6b, #4e54c8);
+      transition: width 0.5s ease-in-out;
+    }
+    .flashcard-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0;
+      perspective: 1000px;
+    }
+    .flashcard {
+      width: 320px;
+      height: 220px;
+      background: #2a2a40;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.4s;
+    }
+    .flashcard div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+    }
+    .flashcard-front {
+      background: #2a2a40;
+      color: #ffffff;
+      border-radius: 16px;
+    }
+    .flashcard-back {
+      background: #ff6b6b;
+      color: white;
+      transform: rotateY(180deg);
+      border-radius: 16px;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    .btn {
+      padding: 14px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 48%;
+      outline: none;
+      font-size: 18px;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.1s;
+    }
+    .btn:hover {
+      opacity: 0.85;
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .learnt { background: #4caf50; color: white; }
+    .not-learnt { background: #f44336; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <h2 id="questionCount">Question 1 of X</h2>
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard">
+        <div class="flashcard-front" id="questionText">Loading...</div>
+        <div class="flashcard-back" id="answerText">Answer</div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="btn learnt" onclick="markAsLearnt(true)">Learnt</button>
+      <button class="btn not-learnt" onclick="markAsLearnt(false)">Not Learnt</button>
+    </div>
+  </div>
+  
+  <script>
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let learntQuestions = JSON.parse(localStorage.getItem("learntQuestions")) || [];
+    let notLearntQuestions = JSON.parse(localStorage.getItem("notLearntQuestions")) || [];
+    let flipped = false;
+
+    function loadQuestions() {
+      let storedQuestions = localStorage.getItem("quizQuestions");
+      if (storedQuestions) {
+        questions = storedQuestions.split("\n").map(q => {
+          let parts = q.split(",");
+          return { 
+            question: parts[0]?.trim() || "(No question provided)", 
+            answer: parts[1]?.trim() || "(No answer provided)" 
+          };
+        }).filter(q => q.question && q.answer);
+      }
+      if (questions.length === 0) {
+        alert("No questions available. Please input questions first.");
+        return;
+      }
+      updateFlashcard();
+    }
+
+    function updateFlashcard() {
+      if (currentQuestionIndex >= questions.length) {
+        localStorage.setItem("learntQuestions", JSON.stringify(learntQuestions));
+        localStorage.setItem("notLearntQuestions", JSON.stringify(notLearntQuestions));
+        // Redirect to results page (now named flashcards-results.html)
+        window.location.href = "flashcards-results.html";
+        return;
+      }
+      flipped = false;
+      document.getElementById("questionText").textContent = questions[currentQuestionIndex].question;
+      document.getElementById("answerText").textContent = questions[currentQuestionIndex].answer;
+      document.getElementById("flashcard").style.transform = "rotateY(0deg)";
+      document.getElementById("questionCount").textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+      document.getElementById("progress").style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
+    }
+
+    function markAsLearnt(isLearnt) {
+      if (isLearnt) {
+        learntQuestions.push(questions[currentQuestionIndex]);
+      } else {
+        notLearntQuestions.push(questions[currentQuestionIndex]);
+      }
+      currentQuestionIndex++;
+      updateFlashcard();
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.code === "Space" && !event.repeat) {
+        event.preventDefault();
+        flipped = !flipped;
+        document.getElementById("flashcard").style.transform = flipped ? "rotateY(180deg)" : "rotateY(0deg)";
+      }
+    });
+
+    window.onload = loadQuestions;
+  </script>
+</body>
+</html>
